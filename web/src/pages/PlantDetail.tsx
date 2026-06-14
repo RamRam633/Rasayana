@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react';
-import { api, type PlantDetail as PD } from '../lib/api';
-import { Loading, Disclaimer, EvidenceBadge } from '../components/ui';
+import { api, type PlantDetail as PD, type Overview } from '../lib/api';
+import { Loading, Disclaimer, EvidenceBadge, EvidenceLegend } from '../components/ui';
 import { Breadcrumbs, Sources } from '../components/nav';
 import { isInchiKey, isTraditional } from '../lib/format';
 import { navigate } from '../lib/router';
 
 export default function PlantDetail({ id }: { id: string }) {
   const [d, setD] = useState<PD | null>(null);
+  const [ov, setOv] = useState<Overview | null>(null);
   const [err, setErr] = useState(false);
-  useEffect(() => { setD(null); setErr(false); api.plant(id).then(setD).catch(() => setErr(true)); }, [id]);
+  useEffect(() => {
+    setD(null); setErr(false); setOv(null);
+    api.plant(id).then(setD).catch(() => setErr(true));
+    api.plantOverview(id).then(setOv).catch(() => {});
+  }, [id]);
 
   if (err) return <div className="page"><p>Plant not found. <a onClick={() => navigate('/plants')}>Back to plants</a></p></div>;
   if (!d) return <div className="page"><Loading label="Loading plant" /></div>;
@@ -40,6 +45,17 @@ export default function PlantDetail({ id }: { id: string }) {
           </div>
         )}
       </div>
+
+      {ov?.found && (
+        <div className="overview">
+          {ov.thumbnail && <img className="ov-thumb" src={ov.thumbnail} alt={d.accepted_name} loading="lazy" />}
+          <div className="ov-text">
+            <p>{ov.extract}</p>
+            {ov.url && <a className="ov-link" href={ov.url} target="_blank" rel="noreferrer">Read on Wikipedia ↗</a>}
+            <div className="ov-cred">overview · Wikipedia (CC BY-SA)</div>
+          </div>
+        </div>
+      )}
 
       <div className="metric-row">
         <div className="metric"><span className="mv">{d.chem_count.toLocaleString()}</span><span className="ml">phytochemicals</span></div>
@@ -77,7 +93,8 @@ export default function PlantDetail({ id }: { id: string }) {
         </div>
       </div>
 
-      <div className="detail-grid" style={{ marginTop: '1.2rem' }}>
+      <EvidenceLegend />
+      <div className="detail-grid">
         <div className="kpanel">
           <h3>Traditional uses</h3>
           <div className="kp-sub">ethnobotanical / classical · Duke</div>
@@ -105,6 +122,21 @@ export default function PlantDetail({ id }: { id: string }) {
               ))}
         </div>
       </div>
+
+      {d.related && d.related.length > 0 && (
+        <>
+          <div className="sec-head"><span className="kick">related</span><h2>More from {d.family}</h2></div>
+          <div className="card-grid">
+            {d.related.map((r) => (
+              <button className="pcard" key={r.id} onClick={() => navigate(`/plant/${r.id}`)}>
+                <span className="pc-name">{r.accepted_name}</span>
+                <span className="pc-fam">{r.family || '—'}</span>
+                <span className="pc-meta"><span><b>{r.chems.toLocaleString()}</b> phytochemicals</span></span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       <Disclaimer />
     </div>

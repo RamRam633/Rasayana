@@ -32,3 +32,12 @@ export function Loading({ label = 'Loading' }: { label?: string }) {
 export function EvidenceBadge({ evidence }: { evidence: string }) {
   return <span className={`ev ${evidence}`}>{evidence}</span>;
 }
+
+export function EvidenceLegend() {
+  return (
+    <div className="ev-legend">
+      <span><span className="ev traditional">traditional</span> recorded folk / classical use (Duke)</span>
+      <span><span className="ev preclinical">preclinical</span> computational or lab association (CMAUP)</span>
+    </div>
+  );
+}

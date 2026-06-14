@@ -172,6 +172,16 @@ def references() -> list[dict]:
     return kg.get_references()
 
 
+@app.get("/common-ailments")
+def common_ailments() -> list[dict]:
+    return kg.get_common_ailments()
+
+
+@app.get("/plants/{plant_id}/overview")
+def plant_overview(plant_id: str) -> dict:
+    return kg.get_plant_overview(plant_id)
+
+
 _CHAT_SYS = (
     "You are Rasayana, a precise assistant for an Indian traditional-medicine knowledge "
     "graph (plants, phytochemicals, protein targets, therapeutic uses across Ayurveda, "

@@ -147,6 +147,12 @@ def get_plant_detail(plant_id: str) -> dict | None:
     p["chem_count"] = counts["chems"]
     p["use_count"] = counts["uses"]
     p["target_count"] = len(p["targets"])
+    p["related"] = _rows(
+        "select p2.id, p2.accepted_name, p2.family, "
+        "(select count(*) from plant_phytochemical x where x.plant_id = p2.id) as chems "
+        "from plant p2 where p2.family is not null and p2.id <> :id "
+        "and p2.family = (select family from plant where id = :id) "
+        "order by chems desc limit 6", id=plant_id)
     return p
 
 
@@ -371,3 +377,35 @@ def get_references() -> list[dict]:
             + (select count(*) from phytochemical_activity where source_id = s.id)
             + (select count(*) from phytochemical_target where source_id = s.id) as edges
            from source s order by edges desc""")
+
+
+# ── discovery: common ailments → top traditional condition ──────────────────
+COMMON_AILMENTS = [
+    ("Fever", "Fever"), ("Cough", "Cough"), ("Diarrhea", "Diarrhoea"),
+    ("Dysentery", "Dysentery"), ("Rheumatism", "Rheumatism"), ("Headache", "Headache"),
+    ("Wound", "Wounds"), ("Inflammation", "Inflammation"), ("Asthma", "Asthma"),
+    ("Jaundice", "Jaundice"), ("Diabetes", "Diabetes"), ("Tonic", "Vitality / tonic"),
+]
+
+
+def get_common_ailments() -> list[dict]:
+    out = []
+    for term, label in COMMON_AILMENTS:
+        r = _rows(
+            "select tu.id, tu.preferred_label, count(distinct pu.plant_id) as plants "
+            "from therapeutic_use tu join plant_use pu on pu.therapeutic_use_id = tu.id "
+            "where pu.evidence in ('traditional','ethnobotanical','clinical') "
+            "and tu.preferred_label ilike :t "
+            "group by tu.id order by plants desc limit 1", t=f"%{term}%")
+        if r:
+            out.append({"label": label, "id": r[0]["id"],
+                        "matched": r[0]["preferred_label"], "plants": r[0]["plants"]})
+    return out
+
+
+def get_plant_overview(plant_id: str) -> dict:
+    from vayu import enrich
+    row = _rows("select accepted_name from plant where id = :id", id=plant_id)
+    if not row:
+        return {"found": False}
+    return enrich.wikipedia_summary(row[0]["accepted_name"])

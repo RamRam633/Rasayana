@@ -22,6 +22,7 @@ export interface PlantDetail {
   resolution_confidence: number | null; is_curated: boolean;
   names: NameRow[]; phytochemicals: ChemRow[]; uses: UseRow[]; targets: TargetRow[];
   chem_count: number; use_count: number; target_count: number;
+  related: { id: string; accepted_name: string; family: string | null; chems: number }[];
 }
 export interface SourceRow { short_code: string; name: string; url?: string; license?: string; is_redistributable?: boolean; provides?: string[]; phase?: string | number; }
 
@@ -49,7 +50,12 @@ export const api = {
     fetch(`/api/plant-index?q=${encodeURIComponent(q)}&family=${encodeURIComponent(family)}&letter=${encodeURIComponent(letter)}&page=${page}`).then(j) as Promise<Page<PlantIndexRow>>,
   searchAll: (q: string) => fetch(`/api/search-all?q=${encodeURIComponent(q)}`).then(j) as Promise<SearchAll>,
   references: () => fetch('/api/references').then(j) as Promise<RefRow[]>,
+  commonAilments: () => fetch('/api/common-ailments').then(j) as Promise<Ailment[]>,
+  plantOverview: (id: string) => fetch(`/api/plants/${id}/overview`).then(j) as Promise<Overview>,
 };
+
+export interface Ailment { label: string; id: string; matched: string; plants: number; }
+export interface Overview { found: boolean; title?: string; extract?: string; thumbnail?: string | null; url?: string | null; }
 
 // ── library browse types ─────────────────────────────────────────────────
 export interface Page<T> { items: T[]; total: number; page: number; page_size: number; }

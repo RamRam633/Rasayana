@@ -5,6 +5,7 @@ import StatStrip from '../components/StatStrip';
 import SearchBox from '../components/SearchBox';
 import PlantCard from '../components/PlantCard';
 import { SectionHead, Disclaimer, Loading } from '../components/ui';
+import AilmentBand from '../components/AilmentBand';
 import { navigate } from '../lib/router';
 
 export default function Home({ onAsk }: { onAsk: () => void }) {
@@ -36,7 +37,10 @@ export default function Home({ onAsk }: { onAsk: () => void }) {
       </section>
 
       <div className="page" style={{ paddingTop: 0 }}>
-        <SectionHead kicker="Begin here" title="Search the atlas" />
+        <SectionHead kicker="Not sure what to ask?" title="Browse by ailment" />
+        <AilmentBand />
+
+        <SectionHead kicker="Or search" title="Find anything" />
         <SearchBox />
 
         <SectionHead kicker="Notable plants" title="Featured materia medica" />

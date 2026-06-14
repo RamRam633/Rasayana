@@ -255,6 +255,26 @@
 /* unified search dropdown */
 .usearch-group { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faintest); padding: 0.55rem 0.9rem 0.2rem; }
 
+/* common ailments band */
+.ailment-band { display: grid; grid-template-columns: repeat(auto-fill, minmax(142px, 1fr)); gap: 0.6rem; margin: 1.1rem 0 0.5rem; }
+.ailment { display: flex; flex-direction: column; align-items: flex-start; gap: 0.12rem; padding: 0.8rem 0.9rem; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-card); cursor: pointer; transition: transform 0.16s var(--ease), border-color 0.16s; text-align: left; }
+.ailment:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--herb) 40%, transparent); }
+.ailment .ai-emoji { font-size: 1.35rem; line-height: 1.3; }
+.ailment .ai-label { font-family: var(--display); font-size: 1.03rem; color: var(--ink); }
+.ailment .ai-count { font-family: var(--mono); font-size: 0.66rem; color: var(--herb-deep); }
+
+/* plant overview (wikipedia, CC BY-SA) */
+.overview { display: flex; gap: 1.2rem; align-items: flex-start; margin: 1.2rem 0; padding: 1.2rem 1.3rem; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-card); }
+.ov-thumb { width: 124px; height: 124px; object-fit: cover; border-radius: var(--r); flex: none; border: 1px solid var(--line); }
+.ov-text p { font-size: 0.94rem; color: var(--prose); margin: 0 0 0.5rem; line-height: 1.6; }
+.ov-link { font-family: var(--mono); font-size: 0.74rem; }
+.ov-cred { font-family: var(--mono); font-size: 0.6rem; color: var(--faintest); letter-spacing: 0.04em; }
+@media (max-width: 600px) { .overview { flex-direction: column; } .ov-thumb { width: 100%; height: 170px; } }
+
+/* evidence legend */
+.ev-legend { display: flex; flex-wrap: wrap; gap: 1.2rem; margin: 0.9rem 0 0.2rem; font-size: 0.78rem; color: var(--muted); }
+.ev-legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+
 /* ---- mobile ---- */
 .menu-only { display: none; }
 @media (max-width: 760px) {
