@@ -7,12 +7,17 @@ from typing import Any
 from config.settings import load_sources
 from vayu.etl import load, transform
 
-# short_code -> "module:Class"
+# short_code -> "module:Class" (streaming, single-entity / small extractors)
 EXTRACTORS: dict[str, str] = {
     "pubchem": "vayu.etl.extract.pubchem:PubChemExtractor",
     "imppat": "vayu.etl.extract.imppat:ImppatExtractor",
-    "duke": "vayu.etl.extract.duke:DukeExtractor",
     "api_ayur": "vayu.etl.extract.pharmacopoeia:PharmacopoeiaExtractor",
+}
+
+# short_code -> "module:function" (bulk, set-based loaders that read+load directly)
+BULK: dict[str, str] = {
+    "duke": "vayu.etl.duke:run",
+    "cmaup": "vayu.etl.cmaup:run",
 }
 
 
@@ -38,8 +43,13 @@ def list_sources() -> dict[str, dict[str, Any]]:
 def run_ingest(
     source: str, *, name: str | None = None, limit: int | None = None, dry_run: bool = False
 ) -> dict[str, Any]:
+    if source in BULK:
+        module_path, fn_name = BULK[source].split(":")
+        loaded = getattr(import_module(module_path), fn_name)()
+        return {"source": source, "loaded": loaded}
+
     if source not in EXTRACTORS:
-        raise SystemExit(f"unknown source '{source}'. known: {sorted(EXTRACTORS)}")
+        raise SystemExit(f"unknown source '{source}'. known: {sorted(EXTRACTORS) + sorted(BULK)}")
 
     extractor = _load_extractor(source)
     raw = list(extractor.extract(name=name, limit=limit))

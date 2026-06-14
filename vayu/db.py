@@ -64,3 +64,26 @@ def source_id(short_code: str) -> str | None:
         return c.execute(
             text("select id from source where short_code = :c"), {"c": short_code}
         ).scalar()
+
+
+# Knowledge tables (truncated by reset_knowledge); reference tables are preserved.
+KNOWLEDGE_TABLES = [
+    "chunk", "document", "xref", "entity_property", "phytochemical_activity",
+    "formulation_use", "formulation_ingredient", "plant_use", "plant_phytochemical",
+    "formulation", "therapeutic_use", "phytochemical", "plant_name", "plant",
+]
+
+
+def reset_knowledge() -> None:
+    """Truncate all knowledge tables (retain source/system/language/property_term).
+    Used to retire the demo seed before bulk ingest."""
+    existing = {"plant", "plant_name", "phytochemical", "therapeutic_use", "formulation",
+                "plant_phytochemical", "plant_use", "formulation_ingredient",
+                "formulation_use", "phytochemical_activity", "entity_property", "xref",
+                "document", "chunk"}
+    with engine().begin() as c:
+        # include optional mechanistic tables if they exist
+        for opt in ("phytochemical_target", "target", "pathway"):
+            if c.execute(text("select to_regclass(:t)"), {"t": opt}).scalar():
+                existing.add(opt)
+        c.execute(text("truncate " + ", ".join(existing) + " restart identity cascade"))

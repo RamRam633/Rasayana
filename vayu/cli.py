@@ -16,6 +16,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("healthcheck", help="check DB connectivity")
     sub.add_parser("sources", help="list registered source extractors")
     sub.add_parser("seed-demo", help="load the curated demo dataset (live GBIF + PubChem)")
+    sub.add_parser("reset-knowledge", help="truncate knowledge tables (retire the demo seed)")
 
     ing = sub.add_parser("ingest", help="run a source extractor -> normalize -> load")
     ing.add_argument("source", help="source short_code (e.g. pubchem, imppat, duke)")
@@ -38,6 +39,11 @@ def main(argv: list[str] | None = None) -> int:
         from vayu.seed import seed_demo
 
         print(json.dumps(seed_demo(), indent=2))
+        return 0
+
+    if args.cmd == "reset-knowledge":
+        db.reset_knowledge()
+        print("knowledge tables truncated (reference data preserved)")
         return 0
 
     if args.cmd == "ingest":

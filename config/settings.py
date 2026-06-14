@@ -25,14 +25,20 @@ class Settings(BaseSettings):
     # ── LLM providers (OpenAI-compatible). The chain in vayu/llm.py tries each
     # configured provider in order until one answers — same resilience idea as the
     # Vayu llm-fallback-framework. Add ANTHROPIC and reorder to prefer Claude.
+    # Ordered by intelligence x reliability (DeZURIK framework). Cerebras gpt-oss-120b
+    # is first — its clean SQL is what fixes text-to-SQL accuracy.
+    cerebras_api_key: str | None = None
+    cerebras_model: str = "gpt-oss-120b"
+    mistral_api_key: str | None = None
+    mistral_model: str = "mistral-large-latest"
     groq_api_key: str | None = None
     groq_model: str = "llama-3.3-70b-versatile"
-    cerebras_api_key: str | None = None
-    cerebras_model: str = "llama-3.3-70b"
-    openrouter_api_key: str | None = None
-    openrouter_model: str = "meta-llama/llama-3.3-70b-instruct"
     nvidia_api_key: str | None = None
     nvidia_model: str = "meta/llama-3.3-70b-instruct"
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini-2.5-flash"
+    openrouter_api_key: str | None = None
+    openrouter_model: str = "meta-llama/llama-3.3-70b-instruct:free"
     # Native Anthropic (optional; not OpenAI-compatible, used directly if set).
     anthropic_api_key: str | None = None
     anthropic_model: str = "claude-sonnet-4-6"

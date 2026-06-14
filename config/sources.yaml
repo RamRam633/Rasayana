@@ -29,6 +29,17 @@ sources:
     phase: 1
     provides: [phytochemical, phytochemical_activity, plant_use]
 
+  - short_code: cmaup
+    name: "CMAUP 2.0 — Collective Molecular Activities of Useful Plants"
+    kind: database
+    publisher: "BIDD Group, National University of Singapore"
+    url: "https://bidd.group/CMAUP/"
+    license: "Free for academic use"
+    is_redistributable: true
+    phase: 1
+    provides: [plant, phytochemical, target, phytochemical_target, plant_use]
+    notes: "Mechanistic layer: ingredients carry InChIKey/PubChem; targets w/ UniProt; plant-disease pre-mapped to ICD-11."
+
   - short_code: pubchem
     name: "PubChem"
     kind: database
