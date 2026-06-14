@@ -1,0 +1,12 @@
+# Runtime dependencies for the Vercel Python serverless API (api/index.py).
+# Lean subset of pyproject: only what the browse + Ask endpoints import at runtime.
+# (No pandas/rdkit/streamlit/uvicorn; Vercel provides the server. voyageai is lazy.)
+fastapi>=0.111
+pydantic>=2.7
+pydantic-settings>=2.3
+sqlalchemy>=2.0
+psycopg[binary]>=3.1
+httpx>=0.27
+tenacity>=8.3
+pyyaml>=6.0
+openai>=1.40

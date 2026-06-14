@@ -4,8 +4,35 @@ A safe, free path to production, shaped the same way Amplitude and Worldsheet al
 ship: a Vite app on Vercel, with one small serverless layer for anything that needs a
 secret. Nothing here puts a key in the repo, and nothing here costs money.
 
-This is a recommendation, not a deploy. The app is running on localhost. When you want to
-go live, follow Path A below, or just say the word and I will wire it up.
+## Launch plan (decided 2026-06-14): Vercel + Neon, free
+
+The stack is chosen and the wiring is built and validated locally: **Vercel** serves the
+static frontend at `rasayana.vayuai.ai` and runs the API as a **Python serverless
+function** (`api/index.py` mounts the FastAPI app under `/api`), reading a free **Neon**
+Postgres. The four deploy artifacts are committed: `vercel.json`, `api/index.py`,
+`requirements.txt` (lean runtime deps), `.vercelignore`. I booted `api/index.py` locally
+and confirmed `/api/stats`, `/api/common-ailments`, `/api/plant-index`, and the `/api/chat`
+SSE stream all answer.
+
+**Two things from you, then I take it live:**
+
+1. **Log in to Vercel:** run `vercel login` in a terminal (or tell me the account/team).
+2. **Create a free Neon project** at neon.tech and paste its connection string into a local
+   file `.env.deploy` (gitignored, never committed):
+   `NEON_DATABASE_URL=postgresql://USER:PASS@ep-xxx-pooler.REGION.aws.neon.tech/neondb?sslmode=require`
+   (use the **pooled** string, the host with `-pooler`, it suits serverless).
+
+**Then I run, from your machine:**
+
+- `bash scripts/load_neon.sh` to dump the local graph and restore it into Neon (79 MB
+  dump, fits the free 512 MB tier), and create the select-only `vayu_ro` role.
+- Set the Vercel env vars (no secret ever printed or committed): `DATABASE_URL` (the Neon
+  URL with the `postgresql+psycopg://` prefix), optional `DATABASE_URL_RO` (the `vayu_ro`
+  role), and the LLM keys copied from your local `.env` (`CEREBRAS_API_KEY`, etc.).
+- `vercel --prod` to build and deploy, then attach `rasayana.vayuai.ai` (your A record is
+  already pointed at Vercel), then smoke-test every surface live.
+
+The rest of this document is the background and the alternative paths.
 
 ## TL;DR
 
