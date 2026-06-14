@@ -1,0 +1,30 @@
+# Local dev backbone. Production DB is intended to be Supabase (just point
+# DATABASE_URL at it and skip this service).
+services:
+  db:
+    image: pgvector/pgvector:pg16   # Postgres 16 with pgvector preinstalled
+    environment:
+      POSTGRES_USER: vayu
+      POSTGRES_PASSWORD: vayu
+      POSTGRES_DB: vayu
+    ports:
+      - "5432:5432"
+    volumes:
+      - vayu_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vayu -d vayu"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional: run the API in a container too (mirrors the Render deploy target).
+  # api:
+  #   build: .
+  #   env_file: .env
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   ports: ["8000:8000"]
+
+volumes:
+  vayu_pgdata:

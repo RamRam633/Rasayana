@@ -1,0 +1,15 @@
+{
+  "//": "Merge into ~/Library/Application Support/Claude/claude_desktop_config.json.",
+  "//cwd": "Use an ABSOLUTE path. Prefer the venv python (.venv/bin/python) so deps resolve.",
+  "//api": "Start the FastAPI core first: `make api`.",
+  "mcpServers": {
+    "vayu-materia": {
+      "command": "/absolute/path/to/vayu-materia/.venv/bin/python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "/absolute/path/to/vayu-materia",
+      "env": {
+        "API_BASE_URL": "http://localhost:8000"
+      }
+    }
+  }
+}

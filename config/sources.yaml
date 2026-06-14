@@ -1,0 +1,97 @@
+# Source registry — the single source of truth for provenance & licensing.
+#
+# `is_redistributable: false` (or unknown license) means the API/UI may show
+# derived facts WITH attribution but must not redistribute the source's bulk
+# content. Verify each license before flipping a flag to true.
+#
+# Phases: 1 = structured backbone (build first), 2 = pharmacopoeia PDFs,
+#         enrichment = vocabulary mapping.
+
+sources:
+  - short_code: imppat
+    name: "IMPPAT 2.0 — Indian Medicinal Plants, Phytochemistry And Therapeutics"
+    kind: database
+    publisher: "The Institute of Mathematical Sciences (IMSc), Chennai"
+    url: "https://cb.imsc.res.in/imppat/"
+    license: "Academic use — VERIFY terms before redistribution"
+    is_redistributable: false
+    phase: 1
+    provides: [plant, phytochemical, plant_phytochemical, plant_use]
+    notes: "Backbone for plant<->chemical<->therapeutic-use. Resolve plant names to POWO/WFO on load."
+
+  - short_code: duke
+    name: "Dr. Duke's Phytochemical and Ethnobotanical Databases"
+    kind: database
+    publisher: "USDA Agricultural Research Service"
+    url: "https://phytochem.nal.usda.gov/"
+    license: "Public domain (U.S. Government work) — VERIFY"
+    is_redistributable: true
+    phase: 1
+    provides: [phytochemical, phytochemical_activity, plant_use]
+
+  - short_code: pubchem
+    name: "PubChem"
+    kind: database
+    publisher: "NCBI / U.S. National Library of Medicine"
+    url: "https://pubchem.ncbi.nlm.nih.gov/"
+    license: "Public domain (PubChem data)"
+    is_redistributable: true
+    phase: 1
+    provides: [phytochemical]
+    notes: "Canonical chemical identity: CID, InChIKey, SMILES, formula. PUG-REST <=5 req/s."
+
+  - short_code: powo
+    name: "Plants of the World Online"
+    kind: ontology
+    publisher: "Royal Botanic Gardens, Kew"
+    url: "https://powo.science.kew.org/"
+    license: "CC BY 3.0 — attribution required"
+    is_redistributable: true
+    phase: 1
+    provides: [plant]
+    notes: "Botanical accepted-name resolution + synonymy."
+
+  - short_code: wfo
+    name: "World Flora Online"
+    kind: ontology
+    publisher: "World Flora Online Consortium"
+    url: "https://www.worldfloraonline.org/"
+    license: "CC BY 4.0"
+    is_redistributable: true
+    phase: 1
+    provides: [plant]
+
+  - short_code: api_ayur
+    name: "The Ayurvedic Pharmacopoeia of India / Ayurvedic Formulary of India"
+    kind: pharmacopoeia
+    publisher: "Ministry of AYUSH, Government of India"
+    url: "https://www.ayush.gov.in/"
+    license: "Government-published — VERIFY redistribution terms"
+    is_redistributable: false
+    phase: 2
+    provides: [formulation, formulation_ingredient, formulation_use, plant]
+    notes: "PDF extraction; load as is_curated=false draft pending review."
+
+  - short_code: icd11
+    name: "ICD-11 (incl. Traditional Medicine Module 2)"
+    kind: ontology
+    publisher: "World Health Organization"
+    url: "https://icd.who.int/"
+    license: "WHO licence — attribution; VERIFY"
+    is_redistributable: false
+    phase: enrichment
+    provides: [therapeutic_use]
+    notes: "Map system disease terms (e.g. Jvara, Prameha) to ICD-11 / TM2 codes."
+
+  - short_code: mesh
+    name: "Medical Subject Headings (MeSH)"
+    kind: ontology
+    publisher: "U.S. National Library of Medicine"
+    url: "https://www.nlm.nih.gov/mesh/"
+    license: "Public domain (U.S. Government work)"
+    is_redistributable: true
+    phase: enrichment
+    provides: [therapeutic_use]
+
+  # TKDL is intentionally absent: access is restricted to patent offices and it
+  # is not available for ingestion. Do not add it.

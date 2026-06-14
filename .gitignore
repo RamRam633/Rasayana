@@ -1,0 +1,38 @@
+# env / secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# data lake (bronze/silver/gold) — never commit ingested data
+data/raw/
+data/interim/
+data/processed/
+!data/**/.gitkeep
+!data/**/README.md
+
+# notebooks
+.ipynb_checkpoints/
+
+# os / editor / local tooling
+.DS_Store
+.idea/
+.vscode/
+.claude/

@@ -1,0 +1,66 @@
+"""Database access. Plain SQLAlchemy Core/sessions over the SQL schema — we keep
+queries as readable SQL rather than a heavy ORM, which also keeps the schema the
+LLM sees (text-to-SQL) identical to the schema we run against.
+"""
+from __future__ import annotations
+
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session, sessionmaker
+
+from config.settings import get_settings
+
+_engine: Engine | None = None
+_Session: sessionmaker | None = None
+
+
+def engine() -> Engine:
+    """Read/write engine (ETL + API)."""
+    global _engine, _Session
+    if _engine is None:
+        s = get_settings()
+        _engine = create_engine(s.database_url, pool_pre_ping=True, future=True)
+        _Session = sessionmaker(bind=_engine, future=True, expire_on_commit=False)
+    return _engine
+
+
+def ro_engine() -> Engine:
+    """Read-only engine for the text-to-SQL path (connects as vayu_ro if configured)."""
+    s = get_settings()
+    url = s.database_url_ro or s.database_url
+    return create_engine(url, pool_pre_ping=True, future=True)
+
+
+@contextmanager
+def session() -> Iterator[Session]:
+    if _Session is None:
+        engine()
+    assert _Session is not None
+    sess = _Session()
+    try:
+        yield sess
+        sess.commit()
+    except Exception:
+        sess.rollback()
+        raise
+    finally:
+        sess.close()
+
+
+def healthcheck() -> bool:
+    try:
+        with engine().connect() as c:
+            return c.execute(text("select 1")).scalar() == 1
+    except Exception:
+        return False
+
+
+def source_id(short_code: str) -> str | None:
+    """Resolve a source short_code to its UUID (for provenance on every edge)."""
+    with engine().connect() as c:
+        return c.execute(
+            text("select id from source where short_code = :c"), {"c": short_code}
+        ).scalar()
