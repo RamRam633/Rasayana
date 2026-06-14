@@ -14,7 +14,7 @@ export default function Sources() {
       <h1 style={{ margin: '0.3rem 0 0.5rem' }}>Sources &amp; references</h1>
       <p className="lede" style={{ marginBottom: '1.2rem' }}>
         Every assertion in Rasayana is traceable to one of these open, citable databases. TKDL is
-        deliberately excluded — it is access-restricted to patent offices.
+        deliberately excluded, it is access-restricted to patent offices.
       </p>
       {!rows ? <Loading /> : (
         <div className="grid" style={{ gridTemplateColumns: '1fr', gap: '0.6rem' }}>

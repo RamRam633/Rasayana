@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Sparkles } from 'lucide-react';
 import { Markdown } from '../lib/markdown';
 import { streamChat, type ChatEvent } from '../lib/api';
 
@@ -35,9 +36,9 @@ export default function Assistant({ open, onClose }: { open: boolean; onClose: (
         if (e.type === 'meta') provider = e.provider;
         else if (e.type === 'sql') { sql = e.sql; rowCount = e.row_count; upd(); }
         else if (e.type === 'delta' && e.text) { acc += e.text; upd(); }
-        else if (e.type === 'error') { acc = acc || `⚠️ ${e.message || 'Unavailable.'}`; upd(); }
+        else if (e.type === 'error') { acc = acc || (e.message || 'That came back empty. Try rephrasing, or browse the library.'); upd(); }
       });
-    } catch (err) { acc = acc || `⚠️ ${String(err)}`; upd(); }
+    } catch (err) { acc = acc || `Something interrupted that answer. ${String(err)}`; upd(); }
     setBusy(false);
   };
 
@@ -47,7 +48,7 @@ export default function Assistant({ open, onClose }: { open: boolean; onClose: (
       <aside className={`asst-panel${open ? ' open' : ''}`} aria-hidden={!open}>
         <div className="asst-header">
           <div className="asst-title">
-            <b>✦ Ask Rasayana</b>
+            <b><Sparkles size={15} strokeWidth={2} /> Ask Rasayana</b>
             <small>natural language over the knowledge graph</small>
           </div>
           <button className="asst-x" onClick={onClose} aria-label="Close">×</button>
@@ -57,7 +58,7 @@ export default function Assistant({ open, onClose }: { open: boolean; onClose: (
             <div className="muted" style={{ fontSize: '0.92rem' }}>
               <p style={{ marginTop: 0 }}>
                 Ask about plants, phytochemicals, protein targets, or therapeutic uses. I write the
-                query, run it read-only against the graph, and answer from the data — citing sources.
+                query, run it read-only against the graph, and answer from the data, citing sources.
                 This is research information, not medical advice.
               </p>
             </div>

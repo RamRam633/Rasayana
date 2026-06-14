@@ -39,7 +39,7 @@ Only these relations exist:
 Rules:
 - SELECT only; never modify data; ALWAYS include a LIMIT (<= 200).
 - Match names CASE-INSENSITIVELY: use lower(col) = lower('value') or col ILIKE '%value%'.
-  Names may be UPPERCASE (Duke source) or Mixed Case (CMAUP) — a plain = will miss rows.
+  Names may be UPPERCASE (Duke source) or Mixed Case (CMAUP), so a plain = will miss rows.
 - Chemical names: phytochemical.preferred_name. Plant names: plant.accepted_name (scientific)
   and plant_name.name (vernacular). Conditions/uses: therapeutic_use.preferred_label.
 - "medicinal plants in the database" = count of the plant table (not plant_use), unless the
@@ -47,7 +47,7 @@ Rules:
 - Join `source` when useful so results can cite provenance (short_code: duke, cmaup, ...).
 - Output the SQL inside a ```sql code block, nothing else.
 
-Example — "how many plants contain curcumin":
+Example, "how many plants contain curcumin":
 ```sql
 SELECT count(DISTINCT pp.plant_id) AS plants
 FROM plant_phytochemical pp JOIN phytochemical ph ON ph.id = pp.phytochemical_id
@@ -107,11 +107,12 @@ def ask(question: str) -> dict:
 def synthesize(question: str, rows: list[dict], max_rows: int = 40) -> tuple[str, str]:
     """Turn result rows into a short, cited, non-prescriptive prose answer."""
     system = (
-        "You are Vayu, a precise assistant for an Indian traditional-medicine knowledge "
+        "You are Rasayana, a precise assistant for an Indian traditional-medicine knowledge "
         "graph. Answer ONLY from the provided result rows; do not invent facts. Be concise "
-        "(2-4 sentences). If rows are empty, say no matching records were found. This is "
-        "traditional/research information, NOT medical advice — give no dosing or treatment "
-        "instructions. Mention source short-codes when present."
+        "(2-4 sentences), and write with commas, colons, and periods rather than dashes. If "
+        "rows are empty, say no matching records were found. This is traditional and research "
+        "information, not medical advice: give no dosing or treatment instructions. Mention "
+        "source short-codes when present."
     )
     user = f"Question: {question}\n\nResult rows (JSON):\n{json.dumps(rows[:max_rows], default=str)}"
     return llm.complete(system, user, max_tokens=350)

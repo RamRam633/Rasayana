@@ -16,14 +16,14 @@ export default function Molecule({ id }: { id: string }) {
 
   const name = prettyChem(d.preferred_name);
   const act = (r: { activity_type: string | null; activity_value: string | null; activity_unit: string | null }) =>
-    [r.activity_type, r.activity_value, r.activity_unit].filter(Boolean).join(' ') || '—';
+    [r.activity_type, r.activity_value, r.activity_unit].filter(Boolean).join(' ') || ', ';
   const plantCols: Column<ChemicalDetail['plants'][number]>[] = [
     { key: 'p', header: 'Plant', render: (r) => <span className="dt-sci">{r.accepted_name}</span>, sortValue: (r) => r.accepted_name.toLowerCase(), width: '55%' },
-    { key: 'f', header: 'Family', render: (r) => r.family || '—' },
+    { key: 'f', header: 'Family', render: (r) => r.family || ', ' },
   ];
   const tgtCols: Column<ChemicalDetail['targets'][number]>[] = [
-    { key: 'g', header: 'Gene', render: (r) => <span className="dt-mono" style={{ color: 'var(--violet)', fontWeight: 600 }}>{r.gene_symbol || '—'}</span>, width: '120px' },
-    { key: 'pr', header: 'Protein', render: (r) => r.protein_name || '—' },
+    { key: 'g', header: 'Gene', render: (r) => <span className="dt-mono" style={{ color: 'var(--violet)', fontWeight: 600 }}>{r.gene_symbol || ', '}</span>, width: '120px' },
+    { key: 'pr', header: 'Protein', render: (r) => r.protein_name || ', ' },
     { key: 'a', header: 'Activity', render: (r) => <span className="dt-mono faint">{act(r)}</span> },
   ];
 

@@ -19,6 +19,7 @@ import PlantDetail from './pages/PlantDetail';
 import Sources from './pages/Sources';
 import CourseHome from './course/CourseHome';
 import CourseShell from './course/CourseShell';
+import { Sparkles } from 'lucide-react';
 
 export default function App() {
   const route = useHashRoute();
@@ -51,7 +52,7 @@ export default function App() {
       <Topbar route={route} onAsk={() => setAsstOpen(true)} />
       <main className="main">{page}</main>
       <footer className="foot">
-        <span className="by">रसायन · Rasayana — a <b>Vayu AI</b> knowledge hub</span>
+        <span className="by">रसायन · Rasayana, a <b>Vayu AI</b> knowledge hub</span>
         <div className="foot-links">
           <a onClick={() => navigate('/library')}>Library</a>
           <a onClick={() => navigate('/sources')}>Sources</a>
@@ -59,7 +60,7 @@ export default function App() {
           <a href="https://vayuai.ai" target="_blank" rel="noreferrer">vayuai.ai</a>
         </div>
       </footer>
-      <button className="asst-fab" onClick={() => setAsstOpen(true)}>✦ Ask Rasayana</button>
+      <button className="asst-fab" onClick={() => setAsstOpen(true)}><Sparkles size={16} strokeWidth={2} /> Ask Rasayana</button>
       <Assistant open={asstOpen} onClose={() => setAsstOpen(false)} />
     </div>
   );

@@ -58,7 +58,7 @@ export default function PlantTargetFlow() {
             onClick={() => pid && navigate(`/plant/${pid}`)}>{PLANTS[pi].n}</div>
         </div>
         <div className="ptf-col">
-          <h5>Molecule — pick one</h5>
+          <h5>Molecule, pick one</h5>
           {chems.length === 0 ? <div className="faint" style={{ fontSize: '0.8rem' }}>loading…</div>
             : chems.map((c, i) => (
               <div key={c.id} className="ptf-node mol"
@@ -67,7 +67,7 @@ export default function PlantTargetFlow() {
             ))}
         </div>
         <div className="ptf-col">
-          <h5>Acts on — proteins</h5>
+          <h5>Acts on, proteins</h5>
           {targets.length === 0 ? <div className="faint" style={{ fontSize: '0.8rem' }}>{chems.length ? 'no mapped targets' : ''}</div>
             : targets.map((t, i) => (
               <div key={i} className="ptf-node tgt">{t.gene_symbol} <span className="faint" style={{ fontFamily: 'var(--sans)' }}>{t.protein_name}</span></div>
@@ -75,7 +75,7 @@ export default function PlantTargetFlow() {
         </div>
       </div>
       <p className="faint" style={{ fontSize: '0.82rem', marginTop: '0.8rem' }}>
-        Live from the knowledge graph — choose a plant, then a molecule, to see the proteins it acts on. Click the plant to open its full page.
+        Live from the knowledge graph, choose a plant, then a molecule, to see the proteins it acts on. Click the plant to open its full page.
       </p>
     </div>
   );

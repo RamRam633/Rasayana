@@ -4,9 +4,9 @@ import type { Column } from '../components/DataTable';
 
 const columns: Column<MoleculeRow>[] = [
   { key: 'name', header: 'Molecule', render: (r) => r.preferred_name, sortValue: (r) => (r.preferred_name || '').toLowerCase(), width: '38%' },
-  { key: 'inchikey', header: 'InChIKey', render: (r) => <span className="dt-mono faint">{r.inchikey || '—'}</span> },
-  { key: 'cid', header: 'PubChem', render: (r) => r.pubchem_cid ? <span className="dt-mono">{r.pubchem_cid}</span> : <span className="faint">—</span>, align: 'right' },
-  { key: 'formula', header: 'Formula', render: (r) => <span className="dt-mono">{r.molecular_formula || '—'}</span> },
+  { key: 'inchikey', header: 'InChIKey', render: (r) => <span className="dt-mono faint">{r.inchikey || ', '}</span> },
+  { key: 'cid', header: 'PubChem', render: (r) => r.pubchem_cid ? <span className="dt-mono">{r.pubchem_cid}</span> : <span className="faint">, </span>, align: 'right' },
+  { key: 'formula', header: 'Formula', render: (r) => <span className="dt-mono">{r.molecular_formula || ', '}</span> },
 ];
 
 export default function Molecules() {
@@ -19,7 +19,7 @@ export default function Molecules() {
       fetchPage={(q, p) => api.molecules(q, p)}
       columns={columns}
       rowTo={(r) => `/molecule/${r.id}`}
-      searchPlaceholder="Filter molecules — curcumin, quercetin, withaferin…"
+      searchPlaceholder="Filter molecules, curcumin, quercetin, withaferin…"
     />
   );
 }

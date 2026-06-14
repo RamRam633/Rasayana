@@ -1,3 +1,5 @@
+import { Info } from 'lucide-react';
+
 export function SectionHead({ kicker, title }: { kicker: string; title: string }) {
   return (
     <div className="sec-head">
@@ -10,10 +12,10 @@ export function SectionHead({ kicker, title }: { kicker: string; title: string }
 export function Disclaimer() {
   return (
     <div className="disclaimer">
-      <span className="d-ico">⚕</span>
+      <span className="d-ico"><Info size={16} strokeWidth={1.8} /></span>
       <p>
         <b>Not medical advice.</b> Rasayana organizes traditional and research claims about
-        plants and molecules — each tagged with its evidence level and source. It is a reference
+        plants and molecules, each tagged with its evidence level and source. It is a reference
         for study, not a substitute for a qualified practitioner.
       </p>
     </div>

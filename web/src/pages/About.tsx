@@ -11,14 +11,14 @@ export default function About() {
       <div className="eyebrow">रसायन · About</div>
       <h1 style={{ margin: '0.4rem 0 0.6rem' }}>Where herb, molecule, and healing converge.</h1>
       <p className="lede">
-        <b>Rasayana</b> — the Ayurvedic science of essence and rejuvenation — is a knowledge hub for
+        <b>Rasayana</b>, the Ayurvedic science of essence and rejuvenation, is a knowledge hub for
         Indian traditional medicine. It ingests open scientific sources, resolves them to canonical
         identities, and weaves them into one provenance-first graph you can browse and ask in plain
         language.
       </p>
       <p>
         It is a sibling to <a href="https://worldsheet.vayuai.ai" target="_blank" rel="noreferrer">Worldsheet</a> and
-        Amplitude — built on the same principle that deep knowledge deserves a beautiful, honest,
+        Amplitude, built on the same principle that deep knowledge deserves a beautiful, honest,
         interactive interface. Every assertion is traceable to a source and tagged with its level of
         evidence, so tradition and modern pharmacology can sit side by side without being confused
         for one another.
@@ -26,7 +26,7 @@ export default function About() {
 
       <h2 style={{ marginTop: '2rem' }}>Sources</h2>
       <p style={{ marginBottom: '0.9rem' }}>
-        Open, citable, and license-checked. TKDL is deliberately excluded — it is access-restricted
+        Open, citable, and license-checked. TKDL is deliberately excluded, it is access-restricted
         to patent offices.
       </p>
       <div className="grid" style={{ gridTemplateColumns: '1fr', gap: '0.6rem' }}>

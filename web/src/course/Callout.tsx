@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { TriangleAlert } from 'lucide-react';
 
 export function KeyIdea({ label = 'Key idea', children }: { label?: string; children: ReactNode }) {
   return (
@@ -12,7 +13,7 @@ export function KeyIdea({ label = 'Key idea', children }: { label?: string; chil
 export function Caution({ children }: { children: ReactNode }) {
   return (
     <div className="caution">
-      <span className="c-ico">⚠</span>
+      <span className="c-ico"><TriangleAlert size={16} strokeWidth={1.8} /></span>
       <p>{children}</p>
     </div>
   );

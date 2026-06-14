@@ -3,7 +3,7 @@
 @import '@fontsource-variable/jetbrains-mono';
 
 /* ============================================================== RASAYANA
-   The VayuAI light theme — a sister to WORLDSHEET and AMPLITUDE. Warm paper,
+   The VayuAI light theme, a sister to WORLDSHEET and AMPLITUDE. Warm paper,
    dark ink. Fraunces for voice, Inter for clarity, JetBrains Mono for data.
    Rasayana's accent soul: herb green -> essence gold -> mind violet.
    ====================================================================== */
@@ -26,7 +26,7 @@
   --faintest: #b6ae9f;
   --prose:  #33302a;
 
-  /* Rasayana accents — herb / essence / mind */
+  /* Rasayana accents, herb / essence / mind */
   --herb:        #1a9d6b;
   --herb-deep:   #0f7d54;
   --herb-bright: #28b67e;

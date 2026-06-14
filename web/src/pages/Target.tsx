@@ -16,19 +16,19 @@ export default function Target({ id }: { id: string }) {
 
   const chemCols: Column<TargetDetail['chemicals'][number]>[] = [
     { key: 'm', header: 'Molecule', render: (r) => prettyChem(r.preferred_name), sortValue: (r) => (r.preferred_name || '').toLowerCase(), width: '40%' },
-    { key: 'k', header: 'InChIKey', render: (r) => <span className="dt-mono faint">{r.inchikey || '—'}</span> },
-    { key: 'a', header: 'Activity', render: (r) => <span className="dt-mono faint">{[r.activity_type, r.activity_value, r.activity_unit].filter(Boolean).join(' ') || '—'}</span> },
+    { key: 'k', header: 'InChIKey', render: (r) => <span className="dt-mono faint">{r.inchikey || ', '}</span> },
+    { key: 'a', header: 'Activity', render: (r) => <span className="dt-mono faint">{[r.activity_type, r.activity_value, r.activity_unit].filter(Boolean).join(' ') || ', '}</span> },
   ];
   const plantCols: Column<TargetDetail['plants'][number]>[] = [
     { key: 'p', header: 'Plant', render: (r) => <span className="dt-sci">{r.accepted_name}</span>, sortValue: (r) => r.accepted_name.toLowerCase(), width: '55%' },
-    { key: 'f', header: 'Family', render: (r) => r.family || '—' },
+    { key: 'f', header: 'Family', render: (r) => r.family || ', ' },
   ];
 
   return (
     <div className="page fade-in">
       <Breadcrumbs items={[{ label: 'Library', to: '/library' }, { label: 'Targets', to: '/targets' }, { label: d.gene_symbol || 'Target' }]} />
       <div className="detail-head">
-        <h1 style={{ margin: '0.2rem 0', color: 'var(--violet)' }}>{d.gene_symbol || '—'}</h1>
+        <h1 style={{ margin: '0.2rem 0', color: 'var(--violet)' }}>{d.gene_symbol || ', '}</h1>
         {d.protein_name && <div className="fam">{d.protein_name}</div>}
       </div>
       <div className="idchips">

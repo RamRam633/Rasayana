@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Check } from 'lucide-react';
 import { LESSONS, lessonBySlug } from './registry';
 import { markVisited, visited } from './progress';
 import { navigate } from '../lib/router';
@@ -24,7 +25,7 @@ export default function CourseShell({ slug }: { slug: string }) {
           <div key={l.slug} className={`cr-link ${l.slug === slug ? 'on' : ''}`} onClick={() => navigate(`/learn/${l.slug}`)}>
             <span className="cr-num">{l.num}</span>
             <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.title}</span>
-            {seen.has(l.slug) && l.slug !== slug && <span className="cr-check">✓</span>}
+            {seen.has(l.slug) && l.slug !== slug && <span className="cr-check"><Check size={12} strokeWidth={2.6} /></span>}
           </div>
         ))}
       </aside>

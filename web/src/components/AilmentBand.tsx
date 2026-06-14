@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api, type Ailment } from '../lib/api';
 import { navigate } from '../lib/router';
-
-const EMOJI: Record<string, string> = {
-  Fever: '🤒', Cough: '😮‍💨', Diarrhoea: '💧', Dysentery: '🚱', Rheumatism: '🦴',
-  Wounds: '🩹', Inflammation: '🔥', Asthma: '🫁', Jaundice: '🟡', Diabetes: '🩸',
-  'Vitality / tonic': '✨', Headache: '🤕',
-};
+import { ailmentIcon } from './icons';
 
 export default function AilmentBand() {
   const [a, setA] = useState<Ailment[]>([]);
@@ -14,13 +9,16 @@ export default function AilmentBand() {
   if (!a.length) return null;
   return (
     <div className="ailment-band">
-      {a.map((x) => (
-        <button className="ailment" key={x.id} onClick={() => navigate(`/condition/${x.id}`)}>
-          <span className="ai-emoji">{EMOJI[x.label] || '🌿'}</span>
-          <span className="ai-label">{x.label}</span>
-          <span className="ai-count">{x.plants.toLocaleString()} plants</span>
-        </button>
-      ))}
+      {a.map((x) => {
+        const Ico = ailmentIcon(x.label);
+        return (
+          <button className="ailment" key={x.id} onClick={() => navigate(`/condition/${x.id}`)}>
+            <span className="ai-ico"><Ico size={20} strokeWidth={1.5} /></span>
+            <span className="ai-label">{x.label}</span>
+            <span className="ai-count">{x.plants.toLocaleString()} plants</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

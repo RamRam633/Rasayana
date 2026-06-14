@@ -17,7 +17,7 @@ export default function Condition({ id }: { id: string }) {
 
   const columns: Column<Row>[] = [
     { key: 'plant', header: 'Plant', render: (r) => <span className="dt-sci">{r.accepted_name}</span>, sortValue: (r) => r.accepted_name.toLowerCase(), width: '42%' },
-    { key: 'family', header: 'Family', render: (r) => r.family || '—' },
+    { key: 'family', header: 'Family', render: (r) => r.family || ', ' },
     { key: 'evidence', header: 'Evidence', render: (r) => <EvidenceBadge evidence={r.evidence} />, sortValue: (r) => r.evidence },
     { key: 'src', header: 'Source', render: (r) => <Sources codes={r.sources} /> },
   ];
@@ -33,7 +33,7 @@ export default function Condition({ id }: { id: string }) {
           <span className="idchip"><b>plants</b>{d.plant_count.toLocaleString()}</span>
         </div>
       </div>
-      <p className="muted" style={{ maxWidth: '70ch' }}>Plants linked to this condition — traditional/ethnobotanical evidence first. Click any plant to follow the thread.</p>
+      <p className="muted" style={{ maxWidth: '70ch' }}>Plants linked to this condition, traditional/ethnobotanical evidence first. Click any plant to follow the thread.</p>
       <DataTable columns={columns} rows={d.plants} onRowClick={(r) => navigate(`/plant/${r.id}`)} />
       <Disclaimer />
     </div>

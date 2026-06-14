@@ -85,7 +85,7 @@ export default function PlantDetail({ id }: { id: string }) {
             ? <p className="faint" style={{ fontSize: '0.86rem' }}>No mapped targets yet.</p>
             : d.targets.map((t) => (
                 <div className="tgt-row click" key={t.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/target/${t.id}`)}>
-                  <span className="gene">{t.gene_symbol || '—'}</span>
+                  <span className="gene">{t.gene_symbol || ', '}</span>
                   <span className="prot">{t.protein_name || ''}</span>
                   <span className="via">{t.via_chemicals}×</span>
                 </div>
@@ -130,7 +130,7 @@ export default function PlantDetail({ id }: { id: string }) {
             {d.related.map((r) => (
               <button className="pcard" key={r.id} onClick={() => navigate(`/plant/${r.id}`)}>
                 <span className="pc-name">{r.accepted_name}</span>
-                <span className="pc-fam">{r.family || '—'}</span>
+                <span className="pc-fam">{r.family || ', '}</span>
                 <span className="pc-meta"><span><b>{r.chems.toLocaleString()}</b> phytochemicals</span></span>
               </button>
             ))}

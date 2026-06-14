@@ -1,5 +1,6 @@
 import Brand from './Brand';
 import { navigate, routeParts } from '../lib/router';
+import { Sparkles } from 'lucide-react';
 
 const LIB = new Set(['library', 'conditions', 'condition', 'molecules', 'molecule',
   'targets', 'target', 'families', 'family', 'plants', 'plant', 'sources']);
@@ -15,7 +16,7 @@ export default function Topbar({ route, onAsk }: { route: string; onAsk: () => v
         <a className={LIB.has(seg) ? 'on' : ''} onClick={() => navigate('/library')}>Library</a>
         <a className={`hide-sm ${seg === 'explore' ? 'on' : ''}`} onClick={() => navigate('/explore')}>Explore</a>
         <a className={`hide-sm ${seg === 'about' ? 'on' : ''}`} onClick={() => navigate('/about')}>About</a>
-        <button className="btn primary sm" onClick={onAsk} style={{ marginLeft: '0.4rem' }}>✦ Ask</button>
+        <button className="btn primary sm" onClick={onAsk} style={{ marginLeft: '0.4rem' }}><Sparkles size={14} strokeWidth={2} /> Ask</button>
       </nav>
     </header>
   );

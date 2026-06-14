@@ -2,11 +2,11 @@ import { useState } from 'react';
 
 const DOSHAS = {
   Vata: { elements: 'Air + Ether', qualities: 'light, dry, cool, mobile, quick',
-    balance: 'warmth, oil, routine, grounding — and sweet · sour · salty tastes', herbs: 'Ashwagandha · Ginger · Bala' },
+    balance: 'warmth, oil, routine, grounding, and sweet · sour · salty tastes', herbs: 'Ashwagandha · Ginger · Bala' },
   Pitta: { elements: 'Fire + Water', qualities: 'hot, sharp, intense, oily, penetrating',
-    balance: 'cooling, calm, moderation — and sweet · bitter · astringent tastes', herbs: 'Amalaki · Coriander · Brahmi' },
+    balance: 'cooling, calm, moderation, and sweet · bitter · astringent tastes', herbs: 'Amalaki · Coriander · Brahmi' },
   Kapha: { elements: 'Earth + Water', qualities: 'heavy, slow, cool, stable, moist',
-    balance: 'lightness, warmth, stimulation — and pungent · bitter · astringent tastes', herbs: 'Trikatu · Guggulu · Pippali' },
+    balance: 'lightness, warmth, stimulation, and pungent · bitter · astringent tastes', herbs: 'Trikatu · Guggulu · Pippali' },
 } as const;
 
 const COLOR: Record<string, string> = { Vata: 'var(--violet)', Pitta: 'var(--ember)', Kapha: 'var(--herb)' };

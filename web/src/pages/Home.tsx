@@ -7,6 +7,7 @@ import PlantCard from '../components/PlantCard';
 import { SectionHead, Disclaimer, Loading } from '../components/ui';
 import AilmentBand from '../components/AilmentBand';
 import { navigate } from '../lib/router';
+import { Sparkles, Leaf, Atom, Target, ArrowRight } from 'lucide-react';
 
 export default function Home({ onAsk }: { onAsk: () => void }) {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -21,17 +22,20 @@ export default function Home({ onAsk }: { onAsk: () => void }) {
       <section className="hero">
         <HeroCanvas />
         <div className="hero-inner">
-          <div className="eyebrow">रसायन · the science of essence</div>
+          <div className="hero-eyebrow-row">
+            <span className="live-badge"><span className="live-dot" /> Live graph</span>
+            <span className="eyebrow">रसायन · the science of essence</span>
+          </div>
           <h1>The living atlas of <span className="grad">Indian medicine</span>.</h1>
           <p className="lede">
             Thousands of medicinal plants, their phytochemistry, and the molecular targets they
-            touch — drawn from Ayurveda, Unani, Siddha and beyond — unified into one queryable
+            touch, drawn from Ayurveda, Unani, Siddha and beyond, unified into one queryable
             knowledge graph. Every claim carries its source.
           </p>
           <div className="hero-cta">
-            <button className="btn primary" onClick={() => navigate('/learn')}>Take the course →</button>
+            <button className="btn primary" onClick={() => navigate('/learn')}>Take the course <ArrowRight size={15} strokeWidth={2} /></button>
             <button className="btn gold" onClick={() => navigate('/library')}>Browse the library</button>
-            <button className="btn violet" onClick={onAsk}>✦ Ask</button>
+            <button className="btn violet" onClick={onAsk}><Sparkles size={15} strokeWidth={2} /> Ask</button>
           </div>
           {stats && <StatStrip stats={stats} />}
         </div>
@@ -51,10 +55,10 @@ export default function Home({ onAsk }: { onAsk: () => void }) {
 
         <SectionHead kicker="What this is" title="From leaf to molecule to mechanism" />
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(236px,1fr))' }}>
-          <div className="kpanel"><h3>🌿 Plants</h3><p style={{ fontSize: '0.9rem' }}>Resolved botanical names, families, and vernacular names — the substances of traditional practice.</p></div>
-          <div className="kpanel"><h3>⚛ Phytochemicals</h3><p style={{ fontSize: '0.9rem' }}>Tens of thousands of constituents with canonical InChIKey identity, linked to the plants that carry them.</p></div>
-          <div className="kpanel"><h3>🎯 Targets</h3><p style={{ fontSize: '0.9rem' }}>The proteins those molecules act on, with binding values — bridging tradition and modern pharmacology.</p></div>
-          <div className="kpanel"><h3>✦ Ask anything</h3><p style={{ fontSize: '0.9rem' }}>A natural-language layer writes read-only SQL over the graph and answers from the data, citing sources.</p></div>
+          <div className="kpanel"><h3><span className="kp-ico"><Leaf size={18} strokeWidth={1.6} /></span>Plants</h3><p style={{ fontSize: '0.9rem' }}>Resolved botanical names, families, and vernacular names, the substances of traditional practice.</p></div>
+          <div className="kpanel"><h3><span className="kp-ico"><Atom size={18} strokeWidth={1.6} /></span>Phytochemicals</h3><p style={{ fontSize: '0.9rem' }}>Tens of thousands of constituents with canonical InChIKey identity, linked to the plants that carry them.</p></div>
+          <div className="kpanel"><h3><span className="kp-ico"><Target size={18} strokeWidth={1.6} /></span>Targets</h3><p style={{ fontSize: '0.9rem' }}>The proteins those molecules act on, with binding values, bridging tradition and modern pharmacology.</p></div>
+          <div className="kpanel"><h3><span className="kp-ico"><Sparkles size={18} strokeWidth={1.6} /></span>Ask anything</h3><p style={{ fontSize: '0.9rem' }}>A natural-language layer writes read-only SQL over the graph and answers from the data, citing sources.</p></div>
         </div>
 
         <Disclaimer />

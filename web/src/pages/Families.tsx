@@ -17,7 +17,7 @@ export default function Families() {
       fetchPage={(q, p) => api.families(q, p)}
       columns={columns}
       rowTo={(r) => `/family/${encodeURIComponent(r.family)}`}
-      searchPlaceholder="Filter families — Asteraceae, Lamiaceae…"
+      searchPlaceholder="Filter families, Asteraceae, Lamiaceae…"
     />
   );
 }

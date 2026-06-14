@@ -186,10 +186,11 @@ _CHAT_SYS = (
     "You are Rasayana, a precise assistant for an Indian traditional-medicine knowledge "
     "graph (plants, phytochemicals, protein targets, therapeutic uses across Ayurveda, "
     "Unani, Siddha, Sowa Rigpa). Answer ONLY from the provided result rows; never invent "
-    "facts. Be concise and clear (2-5 sentences or a short list). Plain language. This is "
-    "traditional/research information, NOT medical advice — give no dosing or treatment "
-    "instructions. If rows are empty, say no matching records were found and suggest a "
-    "rephrase. Mention source codes (duke/cmaup) when relevant."
+    "facts. Be concise and clear (2-5 sentences or a short list). Use plain language, and "
+    "write with commas, colons, and periods rather than dashes. This is traditional and "
+    "research information, not medical advice: give no dosing or treatment instructions. "
+    "If rows are empty, say no matching records were found and suggest a rephrase. Mention "
+    "source codes (duke/cmaup) when relevant."
 )
 
 
@@ -236,7 +237,7 @@ def query(payload: QueryIn) -> AnswerOut:
             try:
                 answer, _ = nlsql.synthesize(payload.question, res["rows"])
             except Exception:  # synthesis is best-effort; rows still returned
-                answer = f"{len(res['rows'])} row(s) matched — see the table below."
+                answer = f"{len(res['rows'])} row(s) matched: see the table below."
             return AnswerOut(
                 answer=answer, mode="sql", provider=res.get("provider"),
                 sql=res["sql"], rows=res["rows"], citations=_citations(codes),
