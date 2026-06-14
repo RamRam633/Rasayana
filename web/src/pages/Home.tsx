@@ -29,8 +29,9 @@ export default function Home({ onAsk }: { onAsk: () => void }) {
             knowledge graph. Every claim carries its source.
           </p>
           <div className="hero-cta">
-            <button className="btn primary" onClick={() => navigate('/explore')}>Explore the atlas →</button>
-            <button className="btn violet" onClick={onAsk}>✦ Ask Rasayana</button>
+            <button className="btn primary" onClick={() => navigate('/learn')}>Take the course →</button>
+            <button className="btn gold" onClick={() => navigate('/library')}>Browse the library</button>
+            <button className="btn violet" onClick={onAsk}>✦ Ask</button>
           </div>
           {stats && <StatStrip stats={stats} />}
         </div>

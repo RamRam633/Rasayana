@@ -17,6 +17,8 @@ import Family from './pages/Family';
 import PlantsIndex from './pages/PlantsIndex';
 import PlantDetail from './pages/PlantDetail';
 import Sources from './pages/Sources';
+import CourseHome from './course/CourseHome';
+import CourseShell from './course/CourseShell';
 
 export default function App() {
   const route = useHashRoute();
@@ -38,6 +40,7 @@ export default function App() {
     case 'plants': page = <PlantsIndex />; break;
     case 'plant': page = id ? <PlantDetail id={id} key={id} /> : <PlantsIndex />; break;
     case 'sources': page = <Sources />; break;
+    case 'learn': page = id ? <CourseShell slug={id} key={id} /> : <CourseHome />; break;
     case 'explore': page = <Explore />; break;
     case 'about': page = <About />; break;
     default: page = <Home onAsk={() => setAsstOpen(true)} />;
