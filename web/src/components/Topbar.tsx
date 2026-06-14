@@ -1,18 +1,19 @@
 import Brand from './Brand';
 import { navigate, routeParts } from '../lib/router';
 
+const LIB = new Set(['library', 'conditions', 'condition', 'molecules', 'molecule',
+  'targets', 'target', 'families', 'family', 'plants', 'plant', 'sources']);
+
 export default function Topbar({ route, onAsk }: { route: string; onAsk: () => void }) {
   const seg = routeParts(route)[0] || 'home';
-  const link = (to: string, label: string, key: string) => (
-    <a className={seg === key ? 'on' : ''} onClick={() => navigate(to)}>{label}</a>
-  );
   return (
     <header className="topbar">
       <Brand />
       <nav className="topnav">
         <a className={seg === 'home' ? 'on' : ''} onClick={() => navigate('/')}>Home</a>
-        {link('/explore', 'Explore', 'explore')}
-        {link('/about', 'About', 'about')}
+        <a className={LIB.has(seg) ? 'on' : ''} onClick={() => navigate('/library')}>Library</a>
+        <a className={`hide-sm ${seg === 'explore' ? 'on' : ''}`} onClick={() => navigate('/explore')}>Explore</a>
+        <a className={`hide-sm ${seg === 'about' ? 'on' : ''}`} onClick={() => navigate('/about')}>About</a>
         <button className="btn primary sm" onClick={onAsk} style={{ marginLeft: '0.4rem' }}>✦ Ask</button>
       </nav>
     </header>

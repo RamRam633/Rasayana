@@ -6,7 +6,8 @@
   "description": "Rasayana — the living atlas of Indian medicine. A Vayu AI knowledge hub.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -p tsconfig.json && vite build",
+    "typecheck": "tsc -p tsconfig.json",
     "preview": "vite preview --port 5273"
   },
   "dependencies": {

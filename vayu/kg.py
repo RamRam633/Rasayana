@@ -112,20 +112,20 @@ def get_plant_detail(plant_id: str) -> dict | None:
     )
     p["uses"] = _rows(
         """
-        select tu.preferred_label, tu.category::text as category, tu.icd11_code,
+        select tu.id, tu.preferred_label, tu.category::text as category, tu.icd11_code,
                max(pu.evidence::text) as evidence, string_agg(distinct s.short_code, ',') as sources
         from plant_use pu
         join therapeutic_use tu on tu.id = pu.therapeutic_use_id
         join source s on s.id = pu.source_id
         where pu.plant_id = :id
-        group by tu.preferred_label, tu.category, tu.icd11_code
+        group by tu.id, tu.preferred_label, tu.category, tu.icd11_code
         order by (max(pu.evidence::text) = 'traditional') desc, tu.preferred_label limit 48
         """,
         id=plant_id,
     )
     p["targets"] = _rows(
         """
-        select t.gene_symbol, t.protein_name,
+        select t.id, t.gene_symbol, t.protein_name,
                count(distinct pt.phytochemical_id) as via_chemicals
         from plant_phytochemical pp
         join phytochemical_target pt on pt.phytochemical_id = pp.phytochemical_id
@@ -192,3 +192,182 @@ def plants_with_phytochemical(inchikey: str, limit: int = 50) -> list[dict]:
         ik=inchikey,
         limit=limit,
     )
+
+
+# ── library browse + detail (paginated lists) ───────────────────────────────
+def _count(sql: str, **p) -> int:
+    return _rows(sql, **p)[0]["n"]
+
+
+def list_conditions(q: str | None = None, traditional: bool = True,
+                    page: int = 1, page_size: int = 50) -> dict:
+    where = ["1=1"]
+    params: dict = {}
+    if traditional:
+        where.append("pu.evidence in ('traditional','ethnobotanical','clinical')")
+    if q:
+        where.append("tu.preferred_label ilike :q")
+        params["q"] = f"%{q}%"
+    w = " and ".join(where)
+    items = _rows(
+        f"""
+        select tu.id, tu.preferred_label, tu.category::text as category, tu.icd11_code,
+               count(distinct pu.plant_id) as plants
+        from therapeutic_use tu
+        join plant_use pu on pu.therapeutic_use_id = tu.id
+        where {w}
+        group by tu.id
+        order by plants desc, tu.preferred_label
+        limit :limit offset :offset
+        """,
+        limit=page_size, offset=(page - 1) * page_size, **params)
+    total = _count(
+        f"select count(*) as n from (select tu.id from therapeutic_use tu "
+        f"join plant_use pu on pu.therapeutic_use_id = tu.id where {w} group by tu.id) z",
+        **params)
+    return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+
+def get_condition(use_id: str) -> dict | None:
+    base = _rows("select id, preferred_label, category::text as category, icd11_code "
+                 "from therapeutic_use where id = :id", id=use_id)
+    if not base:
+        return None
+    c = base[0]
+    c["plants"] = _rows(
+        """
+        select p.id, p.accepted_name, p.family,
+               max(pu.evidence::text) as evidence,
+               string_agg(distinct s.short_code, ',') as sources
+        from plant_use pu join plant p on p.id = pu.plant_id join source s on s.id = pu.source_id
+        where pu.therapeutic_use_id = :id
+        group by p.id
+        order by (max(pu.evidence::text) in ('traditional','ethnobotanical','clinical')) desc, p.accepted_name
+        limit 300
+        """, id=use_id)
+    c["plant_count"] = _count("select count(distinct plant_id) as n from plant_use where therapeutic_use_id = :id", id=use_id)
+    return c
+
+
+def list_families(q: str | None = None, page: int = 1, page_size: int = 60) -> dict:
+    params: dict = {}
+    wq = ""
+    if q:
+        wq = "and family ilike :q"
+        params["q"] = f"%{q}%"
+    items = _rows(
+        f"""select family, count(*) as plants from plant where family is not null {wq}
+            group by family order by plants desc, family limit :limit offset :offset""",
+        limit=page_size, offset=(page - 1) * page_size, **params)
+    total = _count(f"select count(distinct family) as n from plant where family is not null {wq}", **params)
+    return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+
+def get_family(name: str, page: int = 1, page_size: int = 60) -> dict:
+    items = _rows(
+        """select p.id, p.accepted_name, p.family,
+              (select count(*) from plant_phytochemical x where x.plant_id = p.id) as chems
+           from plant p where p.family = :f order by p.accepted_name limit :limit offset :offset""",
+        f=name, limit=page_size, offset=(page - 1) * page_size)
+    total = _count("select count(*) as n from plant where family = :f", f=name)
+    return {"family": name, "items": items, "total": total, "page": page, "page_size": page_size}
+
+
+def list_molecules(q: str | None = None, named: bool = True,
+                   page: int = 1, page_size: int = 50) -> dict:
+    where = ["1=1"]
+    params: dict = {}
+    if named:
+        where.append("preferred_name is not null and preferred_name !~ '^[A-Z]{14}-'")
+    if q:
+        where.append("preferred_name ilike :q")
+        params["q"] = f"%{q}%"
+    w = " and ".join(where)
+    items = _rows(
+        f"""select id, preferred_name, inchikey, pubchem_cid, chembl_id, molecular_formula
+            from phytochemical where {w} order by preferred_name limit :limit offset :offset""",
+        limit=page_size, offset=(page - 1) * page_size, **params)
+    total = _count(f"select count(*) as n from phytochemical where {w}", **params)
+    return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+
+def list_targets(q: str | None = None, page: int = 1, page_size: int = 50) -> dict:
+    params: dict = {}
+    wq = ""
+    if q:
+        wq = "where t.gene_symbol ilike :q or t.protein_name ilike :q"
+        params["q"] = f"%{q}%"
+    items = _rows(
+        f"""select t.id, t.gene_symbol, t.protein_name, t.uniprot_id, t.target_class,
+                  count(distinct pt.phytochemical_id) as chems
+            from target t left join phytochemical_target pt on pt.target_id = t.id
+            {wq} group by t.id order by chems desc, t.gene_symbol limit :limit offset :offset""",
+        limit=page_size, offset=(page - 1) * page_size, **params)
+    total = _count(f"select count(*) as n from target t {wq}", **params)
+    return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+
+def get_target(tid: str) -> dict | None:
+    base = _rows("select id, gene_symbol, protein_name, uniprot_id, chembl_id, target_class "
+                 "from target where id = :id", id=tid)
+    if not base:
+        return None
+    t = base[0]
+    t["chemicals"] = _rows(
+        """select ph.id, ph.preferred_name, ph.inchikey,
+                  pt.activity_type, pt.activity_value, pt.activity_unit
+           from phytochemical_target pt join phytochemical ph on ph.id = pt.phytochemical_id
+           where pt.target_id = :id order by ph.preferred_name limit 120""", id=tid)
+    t["plants"] = _rows(
+        """select distinct p.id, p.accepted_name, p.family
+           from phytochemical_target pt
+           join plant_phytochemical pp on pp.phytochemical_id = pt.phytochemical_id
+           join plant p on p.id = pp.plant_id
+           where pt.target_id = :id order by p.accepted_name limit 80""", id=tid)
+    t["chem_count"] = _count("select count(distinct phytochemical_id) as n from phytochemical_target where target_id = :id", id=tid)
+    return t
+
+
+def list_plants_index(q: str | None = None, family: str | None = None,
+                      letter: str | None = None, page: int = 1, page_size: int = 50) -> dict:
+    where = ["1=1"]
+    params: dict = {}
+    if family:
+        where.append("p.family = :family"); params["family"] = family
+    if letter:
+        where.append("p.accepted_name ilike :letter"); params["letter"] = f"{letter}%"
+    if q:
+        where.append("p.accepted_name ilike :q"); params["q"] = f"%{q}%"
+    w = " and ".join(where)
+    items = _rows(
+        f"""select p.id, p.accepted_name, p.family,
+               (select count(*) from plant_phytochemical x where x.plant_id = p.id) as chems
+            from plant p where {w} order by p.accepted_name limit :limit offset :offset""",
+        limit=page_size, offset=(page - 1) * page_size, **params)
+    total = _count(f"select count(*) as n from plant p where {w}", **params)
+    return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+
+def search_all(q: str, limit: int = 6) -> dict:
+    like = f"%{q}%"
+    return {
+        "plants": _rows("select id, accepted_name as label, family as sub from plant "
+                        "where accepted_name ilike :q order by accepted_name limit :n", q=like, n=limit),
+        "molecules": _rows("select id, preferred_name as label, inchikey as sub from phytochemical "
+                           "where preferred_name ilike :q and preferred_name !~ '^[A-Z]{14}-' "
+                           "order by preferred_name limit :n", q=like, n=limit),
+        "conditions": _rows("select id, preferred_label as label, category::text as sub from therapeutic_use "
+                            "where preferred_label ilike :q order by preferred_label limit :n", q=like, n=limit),
+        "targets": _rows("select id, gene_symbol as label, protein_name as sub from target "
+                         "where gene_symbol ilike :q or protein_name ilike :q order by gene_symbol limit :n", q=like, n=4),
+    }
+
+
+def get_references() -> list[dict]:
+    return _rows(
+        """select s.short_code, s.name, s.url, s.license, s.is_redistributable,
+              (select count(*) from plant_phytochemical where source_id = s.id)
+            + (select count(*) from plant_use where source_id = s.id)
+            + (select count(*) from phytochemical_activity where source_id = s.id)
+            + (select count(*) from phytochemical_target where source_id = s.id) as edges
+           from source s order by edges desc""")

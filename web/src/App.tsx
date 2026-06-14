@@ -4,19 +4,44 @@ import Topbar from './components/Topbar';
 import Assistant from './components/Assistant';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
-import PlantDetail from './pages/PlantDetail';
 import About from './pages/About';
+import Library from './pages/Library';
+import Conditions from './pages/Conditions';
+import Condition from './pages/Condition';
+import Molecules from './pages/Molecules';
+import Molecule from './pages/Molecule';
+import Targets from './pages/Targets';
+import Target from './pages/Target';
+import Families from './pages/Families';
+import Family from './pages/Family';
+import PlantsIndex from './pages/PlantsIndex';
+import PlantDetail from './pages/PlantDetail';
+import Sources from './pages/Sources';
 
 export default function App() {
   const route = useHashRoute();
   const [asstOpen, setAsstOpen] = useState(false);
-  const parts = routeParts(route);
+  const p = routeParts(route);
+  const id = p[1] ? decodeURIComponent(p[1]) : '';
 
   let page;
-  if (parts[0] === 'plant' && parts[1]) page = <PlantDetail id={parts[1]} key={parts[1]} />;
-  else if (parts[0] === 'explore') page = <Explore />;
-  else if (parts[0] === 'about') page = <About />;
-  else page = <Home onAsk={() => setAsstOpen(true)} />;
+  switch (p[0]) {
+    case 'library': page = <Library />; break;
+    case 'conditions': page = <Conditions />; break;
+    case 'condition': page = <Condition id={id} key={id} />; break;
+    case 'molecules': page = <Molecules />; break;
+    case 'molecule': page = <Molecule id={id} key={id} />; break;
+    case 'targets': page = <Targets />; break;
+    case 'target': page = <Target id={id} key={id} />; break;
+    case 'families': page = <Families />; break;
+    case 'family': page = <Family name={id} key={id} />; break;
+    case 'plants': page = <PlantsIndex />; break;
+    case 'plant': page = id ? <PlantDetail id={id} key={id} /> : <PlantsIndex />; break;
+    case 'sources': page = <Sources />; break;
+    case 'explore': page = <Explore />; break;
+    case 'about': page = <About />; break;
+    default: page = <Home onAsk={() => setAsstOpen(true)} />;
+  }
 
   return (
     <div className="app">
@@ -25,7 +50,8 @@ export default function App() {
       <footer className="foot">
         <span className="by">रसायन · Rasayana — a <b>Vayu AI</b> knowledge hub</span>
         <div className="foot-links">
-          <a onClick={() => navigate('/explore')}>Explore</a>
+          <a onClick={() => navigate('/library')}>Library</a>
+          <a onClick={() => navigate('/sources')}>Sources</a>
           <a onClick={() => navigate('/about')}>About</a>
           <a href="https://vayuai.ai" target="_blank" rel="noreferrer">vayuai.ai</a>
         </div>

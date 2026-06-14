@@ -114,6 +114,64 @@ def chemical(chem_id: str) -> dict:
     return c
 
 
+# ── library browse ──────────────────────────────────────────────────────────
+@app.get("/conditions")
+def conditions(q: str | None = None, traditional: bool = True, page: int = 1, page_size: int = 50) -> dict:
+    return kg.list_conditions(q=q, traditional=traditional, page=page, page_size=page_size)
+
+
+@app.get("/conditions/{use_id}")
+def condition(use_id: str) -> dict:
+    c = kg.get_condition(use_id)
+    if not c:
+        raise HTTPException(404, "condition not found")
+    return c
+
+
+@app.get("/families")
+def families(q: str | None = None, page: int = 1, page_size: int = 60) -> dict:
+    return kg.list_families(q=q, page=page, page_size=page_size)
+
+
+@app.get("/families/{name}")
+def family(name: str, page: int = 1, page_size: int = 60) -> dict:
+    return kg.get_family(name, page=page, page_size=page_size)
+
+
+@app.get("/molecules")
+def molecules(q: str | None = None, named: bool = True, page: int = 1, page_size: int = 50) -> dict:
+    return kg.list_molecules(q=q, named=named, page=page, page_size=page_size)
+
+
+@app.get("/targets")
+def targets(q: str | None = None, page: int = 1, page_size: int = 50) -> dict:
+    return kg.list_targets(q=q, page=page, page_size=page_size)
+
+
+@app.get("/targets/{tid}")
+def target(tid: str) -> dict:
+    t = kg.get_target(tid)
+    if not t:
+        raise HTTPException(404, "target not found")
+    return t
+
+
+@app.get("/plant-index")
+def plant_index(q: str | None = None, family: str | None = None, letter: str | None = None,
+                page: int = 1, page_size: int = 50) -> dict:
+    return kg.list_plants_index(q=q, family=family, letter=letter, page=page, page_size=page_size)
+
+
+@app.get("/search-all")
+def search_all_ep(q: str) -> dict:
+    return kg.search_all(q)
+
+
+@app.get("/references")
+def references() -> list[dict]:
+    return kg.get_references()
+
+
 _CHAT_SYS = (
     "You are Rasayana, a precise assistant for an Indian traditional-medicine knowledge "
     "graph (plants, phytochemicals, protein targets, therapeutic uses across Ayurveda, "
