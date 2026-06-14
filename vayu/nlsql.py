@@ -13,6 +13,7 @@ import json
 import re
 
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from vayu import db, llm
 
@@ -38,8 +39,13 @@ Only these relations exist:
 
 Rules:
 - SELECT only; never modify data; ALWAYS include a LIMIT (<= 200).
-- Match names CASE-INSENSITIVELY: use lower(col) = lower('value') or col ILIKE '%value%'.
+- Match names CASE-INSENSITIVELY, but ONLY on free-text name columns
+  (plant.accepted_name, plant_name.name, phytochemical.preferred_name,
+  therapeutic_use.preferred_label): use lower(col) = lower('value') or col ILIKE '%value%'.
   Names may be UPPERCASE (Duke source) or Mixed Case (CMAUP), so a plain = will miss rows.
+- Do NOT wrap enum / code columns in lower(): name_kind, evidence, category, plant_part,
+  dosage_form, kind, role compare with a plain = 'value'
+  (e.g. plant_name.name_kind = 'vernacular', not lower(name_kind) = 'vernacular').
 - Chemical names: phytochemical.preferred_name. Plant names: plant.accepted_name (scientific)
   and plant_name.name (vernacular). Conditions/uses: therapeutic_use.preferred_label.
 - "medicinal plants in the database" = count of the plant table (not plant_use), unless the
@@ -97,11 +103,28 @@ def generate_sql(question: str) -> tuple[str, str]:
     return _extract_sql(raw), provider
 
 
+def repair_sql(question: str, bad_sql: str, error: str) -> tuple[str, str]:
+    """Hand the model the failing SQL plus the Postgres error for one corrected attempt."""
+    msg = (f"{question}\n\nThe previous query failed with a Postgres error. Return ONLY a "
+           f"corrected single SELECT.\n\n-- SQL\n{bad_sql}\n\n-- error\n{error}")
+    raw, provider = llm.complete(SCHEMA_PROMPT, msg, max_tokens=600)
+    return _extract_sql(raw), provider
+
+
 def ask(question: str) -> dict:
-    """Full text-to-SQL turn: generate -> guard -> run."""
+    """Full text-to-SQL turn: generate -> guard -> run, with one self-repair on a DB error.
+
+    LLM-written SQL occasionally trips a Postgres rule (e.g. wrapping an enum in lower()).
+    Rather than fail the turn, we feed the error back once and retry the corrected query."""
     sql, provider = generate_sql(question)
     safe = guard_sql(sql)
-    return {"mode": "sql", "sql": safe, "rows": run_sql(safe), "provider": provider}
+    try:
+        rows = run_sql(safe)
+    except SQLAlchemyError as e:
+        fixed, provider = repair_sql(question, safe, str(getattr(e, "orig", e)))
+        safe = guard_sql(fixed)
+        rows = run_sql(safe)
+    return {"mode": "sql", "sql": safe, "rows": rows, "provider": provider}
 
 
 def synthesize(question: str, rows: list[dict], max_rows: int = 40) -> tuple[str, str]:

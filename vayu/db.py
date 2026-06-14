@@ -22,7 +22,12 @@ def engine() -> Engine:
     global _engine, _Session
     if _engine is None:
         s = get_settings()
-        _engine = create_engine(s.database_url, pool_pre_ping=True, future=True)
+        _engine = create_engine(
+            s.database_url, pool_pre_ping=True, future=True,
+            # prepare_threshold=None keeps psycopg3 safe behind a transaction pooler
+            # (Neon's pooled endpoint / pgbouncer), which rejects server-side prepares.
+            connect_args={"prepare_threshold": None},
+        )
         _Session = sessionmaker(bind=_engine, future=True, expire_on_commit=False)
     return _engine
 
@@ -31,7 +36,10 @@ def ro_engine() -> Engine:
     """Read-only engine for the text-to-SQL path (connects as vayu_ro if configured)."""
     s = get_settings()
     url = s.database_url_ro or s.database_url
-    return create_engine(url, pool_pre_ping=True, future=True)
+    return create_engine(
+        url, pool_pre_ping=True, future=True,
+        connect_args={"prepare_threshold": None},
+    )
 
 
 @contextmanager

@@ -206,10 +206,13 @@ def chat(payload: QueryIn):
         try:
             res = nlsql.ask(payload.question)
         except ValueError as e:
-            yield _sse({"type": "error", "message": f"I couldn't form a safe query: {e}"})
+            yield _sse({"type": "error", "message": f"I couldn't form a safe query for that. {e}"})
             return
         except Exception as e:  # noqa: BLE001
-            yield _sse({"type": "error", "message": f"The query engine is unavailable: {e}"})
+            print(f"[chat] query failed: {e}")
+            yield _sse({"type": "error",
+                        "message": "I couldn't answer that one from the data. "
+                                   "Try rephrasing it, or browse the library."})
             return
         yield _sse({"type": "sql", "sql": res["sql"], "rows": res["rows"][:50],
                     "row_count": len(res["rows"])})
@@ -221,7 +224,10 @@ def chat(payload: QueryIn):
                            else {"type": "delta", "text": val})
             yield _sse({"type": "done"})
         except Exception as e:  # noqa: BLE001
-            yield _sse({"type": "error", "message": f"Answer synthesis failed: {e}"})
+            print(f"[chat] synthesis failed: {e}")
+            yield _sse({"type": "error",
+                        "message": "I found rows but couldn't summarize them. "
+                                   "The table above has the data."})
 
     return StreamingResponse(gen(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
