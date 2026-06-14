@@ -73,6 +73,39 @@ def complete(system: str, user: str, *, max_tokens: int = 800, temperature: floa
     raise RuntimeError("All configured LLM providers failed: " + " | ".join(errors))
 
 
+def stream(system: str, user: str, *, max_tokens: int = 700, temperature: float = 0.2):
+    """Generator yielding ('meta', provider) then ('delta', text)… from the first
+    working provider. Powers the streaming assistant."""
+    from openai import OpenAI  # noqa: F401  (used via _client)
+
+    chain = _chain()
+    if not chain:
+        raise RuntimeError("No LLM provider configured (see .env).")
+    errors: list[str] = []
+    for p in chain:
+        try:
+            resp = _client(p).chat.completions.create(
+                model=p.model, temperature=temperature, max_tokens=max_tokens, stream=True,
+                messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+            )
+            yield ("meta", p.name)
+            got = False
+            for chunk in resp:
+                if not chunk.choices:
+                    continue
+                delta = chunk.choices[0].delta.content
+                if delta:
+                    got = True
+                    yield ("delta", delta)
+            if got:
+                return
+            errors.append(f"{p.name}: empty")
+        except Exception as e:  # noqa: BLE001
+            log.warning("LLM provider %s stream failed: %s", p.name, e)
+            errors.append(f"{p.name}: {type(e).__name__}")
+    raise RuntimeError("All configured LLM providers failed: " + " | ".join(errors))
+
+
 def chat(messages: list[dict], *, tools: list | None = None, max_tokens: int = 900,
          temperature: float = 0.0) -> tuple[Any, str]:
     """Lower-level call returning (message, provider). Supports OpenAI tool calling —

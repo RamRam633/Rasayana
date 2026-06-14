@@ -36,10 +36,23 @@ Only these relations exist:
   entity_property(entity_type, entity_id, property_term_id)
   -- convenience views: v_plant_overview, v_formulation_detail, v_plant_search
 
-Rules: SELECT only; never modify data; always include a LIMIT (<=200);
-join `source` when useful so results can cite provenance; phytochemical names are
-in phytochemical.preferred_name; plant names in plant.accepted_name and plant_name.name.
-Output the SQL inside a ```sql code block, nothing else."""
+Rules:
+- SELECT only; never modify data; ALWAYS include a LIMIT (<= 200).
+- Match names CASE-INSENSITIVELY: use lower(col) = lower('value') or col ILIKE '%value%'.
+  Names may be UPPERCASE (Duke source) or Mixed Case (CMAUP) — a plain = will miss rows.
+- Chemical names: phytochemical.preferred_name. Plant names: plant.accepted_name (scientific)
+  and plant_name.name (vernacular). Conditions/uses: therapeutic_use.preferred_label.
+- "medicinal plants in the database" = count of the plant table (not plant_use), unless the
+  user explicitly asks about uses/indications.
+- Join `source` when useful so results can cite provenance (short_code: duke, cmaup, ...).
+- Output the SQL inside a ```sql code block, nothing else.
+
+Example — "how many plants contain curcumin":
+```sql
+SELECT count(DISTINCT pp.plant_id) AS plants
+FROM plant_phytochemical pp JOIN phytochemical ph ON ph.id = pp.phytochemical_id
+WHERE lower(ph.preferred_name) = lower('curcumin') LIMIT 200
+```"""
 
 _FORBIDDEN = re.compile(
     r"\b(insert|update|delete|drop|alter|create|truncate|grant|revoke|copy|"

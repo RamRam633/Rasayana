@@ -41,8 +41,14 @@ seed: ## Load the curated demo dataset (live GBIF + PubChem)
 api: ## Run the FastAPI core (http://localhost:8000, /docs for OpenAPI)
 	.venv/bin/uvicorn vayu.api.main:app --reload --port 8000
 
-ui: ## Run the Streamlit UI (http://localhost:8501)
+ui: ## Run the legacy Streamlit UI (http://localhost:8501)
 	.venv/bin/streamlit run ui/app.py
+
+web-install: ## Install the Rasayana web app deps
+	npm --prefix web install
+
+web: ## Run the Rasayana web app (Vite, http://localhost:5173 — needs `make api`)
+	npm --prefix web run dev
 
 mcp: ## Run the MCP server (stdio) for Claude Desktop
 	$(PY) -m mcp_server.server

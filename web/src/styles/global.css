@@ -1,0 +1,203 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+/* ============================================================== RASAYANA
+   The VayuAI light theme — a sister to WORLDSHEET and AMPLITUDE. Warm paper,
+   dark ink. Fraunces for voice, Inter for clarity, JetBrains Mono for data.
+   Rasayana's accent soul: herb green -> essence gold -> mind violet.
+   ====================================================================== */
+
+:root {
+  /* surfaces: warm paper */
+  --bg:        #f5f1e8;
+  --bg-2:      #fbf8f1;
+  --panel:     #fffdf8;
+  --panel-2:   #fbf7ee;
+  --panel-3:   #f0eadc;
+  --card:      #ffffff;
+  --line:      rgba(42, 37, 32, 0.16);
+  --line-soft: rgba(42, 37, 32, 0.08);
+
+  /* warm dark ink */
+  --ink:    #1f1b17;
+  --muted:  #6b6356;
+  --faint:  #9a9082;
+  --faintest: #b6ae9f;
+  --prose:  #33302a;
+
+  /* Rasayana accents — herb / essence / mind */
+  --herb:        #1a9d6b;
+  --herb-deep:   #0f7d54;
+  --herb-bright: #28b67e;
+  --gold:        #b8860b;
+  --gold-soft:   #a87514;
+  --gold-bright: #d4af37;
+  --violet:      #6d3bd4;
+  --violet-bright: #7d4ee0;
+  --cyan:   #0e8fa8;
+  --rose:   #bd3478;
+  --ember:  #c2581f;
+  --burgundy: #a34c6d;
+  --amber:  #a87514;
+  --accent: var(--herb);
+
+  /* VayuAI brand */
+  --gold-brand: #d4af37;
+
+  /* soft glows / shadows for light */
+  --glow-herb:   0 8px 22px -12px rgba(26, 157, 107, 0.5);
+  --glow-violet: 0 8px 22px -12px rgba(109, 59, 212, 0.5);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 14px 38px -22px rgba(42, 37, 32, 0.28);
+
+  /* type */
+  --display: 'Fraunces Variable', Georgia, serif;
+  --sans: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* metrics */
+  --r-sm: 9px;
+  --r:    12px;
+  --r-lg: 18px;
+  --maxw: 1240px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.65;
+  font-size: 16.5px;
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* warm paper backdrop with faint herb + gold washes */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(1100px 720px at 14% -8%, rgba(26, 157, 107, 0.07), transparent 60%),
+    radial-gradient(960px 700px at 92% 2%, rgba(184, 134, 11, 0.06), transparent 55%),
+    radial-gradient(800px 600px at 60% 108%, rgba(109, 59, 212, 0.045), transparent 60%),
+    var(--bg);
+}
+
+::selection { background: rgba(26, 157, 107, 0.2); color: var(--ink); }
+* { scrollbar-width: thin; scrollbar-color: rgba(26, 157, 107, 0.3) transparent; }
+
+/* --- type --- */
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 540; line-height: 1.12; letter-spacing: -0.005em; color: var(--ink); }
+h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); font-optical-sizing: auto; }
+h2 { font-size: clamp(1.7rem, 3.6vw, 2.6rem); }
+h3 { font-size: clamp(1.2rem, 2.2vw, 1.5rem); }
+p { color: var(--muted); }
+a { color: var(--herb-deep); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+code, kbd, .mono { font-family: var(--mono); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.lede { font-size: clamp(1.05rem, 1.6vw, 1.28rem); color: var(--muted); max-width: 62ch; }
+
+/* signature gradient text: herb -> essence -> mind */
+.grad {
+  background: linear-gradient(96deg, var(--herb) 0%, var(--gold) 52%, var(--violet) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* --- layout --- */
+.wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(18px, 4vw, 48px); }
+.stack { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; }
+.spread { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.grid { display: grid; gap: clamp(16px, 2.4vw, 28px); }
+
+/* --- panels --- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+.panel-pad { padding: clamp(18px, 2.6vw, 30px); }
+.hairline { border-top: 1px solid var(--line-soft); }
+
+/* --- buttons --- */
+.btn {
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  font-weight: 540;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 0.55em 1.1em;
+  cursor: pointer;
+  transition: all 0.18s var(--ease);
+  display: inline-flex; align-items: center; gap: 0.5em;
+  white-space: nowrap;
+}
+.btn:hover { border-color: color-mix(in srgb, var(--herb) 45%, transparent); background: var(--bg-2); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--herb), var(--herb-deep));
+  border-color: transparent; color: #fff; box-shadow: var(--glow-herb);
+}
+.btn.primary:hover { filter: brightness(1.06); color: #fff; }
+.btn.gold { background: linear-gradient(135deg, var(--gold-bright), var(--gold-soft)); color: #3a2a06; border-color: transparent; font-weight: 600; }
+.btn.violet { background: linear-gradient(135deg, var(--violet), #5a2fc0); color: #fff; border-color: transparent; }
+.btn.ghost { background: transparent; }
+.btn.sm { font-size: 0.82rem; padding: 0.42em 0.8em; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.chip {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  padding: 0.28em 0.7em;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: var(--card);
+}
+
+/* --- forms --- */
+input[type='text'], input[type='search'] {
+  font-family: var(--sans); font-size: 1rem; color: var(--ink);
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 0.7em 1em; width: 100%;
+}
+input[type='text']:focus, input[type='search']:focus { outline: none; border-color: var(--herb); box-shadow: 0 0 0 3px rgba(26,157,107,0.12); }
+
+/* --- misc --- */
+.divider { height: 1px; background: var(--line-soft); border: 0; margin: 1.4rem 0; }
+.fade-in { animation: fade 0.5s var(--ease) both; }
+@keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.faint { color: var(--faint); }
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); }
+
+.scrolly::-webkit-scrollbar { width: 10px; height: 10px; }
+.scrolly::-webkit-scrollbar-thumb { background: rgba(26, 157, 107, 0.24); border-radius: 99px; border: 2px solid var(--bg); }
+.scrolly::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

@@ -31,6 +31,13 @@ data/processed/
 # notebooks
 .ipynb_checkpoints/
 
+# node / web frontend
+node_modules/
+web/node_modules/
+web/dist/
+*.tsbuildinfo
+.vite/
+
 # os / editor / local tooling
 .DS_Store
 .idea/

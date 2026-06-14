@@ -6,8 +6,11 @@ rest of the app stays usable.
 """
 from __future__ import annotations
 
+import json
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from config.settings import load_sources
@@ -83,6 +86,76 @@ def formulation(formulation_id: str) -> dict:
 @app.get("/phytochemicals/{inchikey}/plants")
 def plants_with_chem(inchikey: str, limit: int = 50) -> list[dict]:
     return kg.plants_with_phytochemical(inchikey, limit=limit)
+
+
+@app.get("/stats")
+def stats() -> dict:
+    return kg.get_stats()
+
+
+@app.get("/featured")
+def featured() -> list[dict]:
+    return kg.get_featured()
+
+
+@app.get("/plants/{plant_id}/detail")
+def plant_detail(plant_id: str) -> dict:
+    d = kg.get_plant_detail(plant_id)
+    if not d:
+        raise HTTPException(404, "plant not found")
+    return d
+
+
+@app.get("/chemicals/{chem_id}")
+def chemical(chem_id: str) -> dict:
+    c = kg.get_chemical(chem_id)
+    if not c:
+        raise HTTPException(404, "phytochemical not found")
+    return c
+
+
+_CHAT_SYS = (
+    "You are Rasayana, a precise assistant for an Indian traditional-medicine knowledge "
+    "graph (plants, phytochemicals, protein targets, therapeutic uses across Ayurveda, "
+    "Unani, Siddha, Sowa Rigpa). Answer ONLY from the provided result rows; never invent "
+    "facts. Be concise and clear (2-5 sentences or a short list). Plain language. This is "
+    "traditional/research information, NOT medical advice — give no dosing or treatment "
+    "instructions. If rows are empty, say no matching records were found and suggest a "
+    "rephrase. Mention source codes (duke/cmaup) when relevant."
+)
+
+
+def _sse(obj: dict) -> str:
+    return f"data: {json.dumps(obj, default=str)}\n\n"
+
+
+@app.post("/chat")
+def chat(payload: QueryIn):
+    """Streaming assistant: text-to-SQL over the graph, then a streamed cited answer.
+    SSE event shape mirrors the Vayu Tutor: meta / sql / delta / done / error."""
+    def gen():
+        try:
+            res = nlsql.ask(payload.question)
+        except ValueError as e:
+            yield _sse({"type": "error", "message": f"I couldn't form a safe query: {e}"})
+            return
+        except Exception as e:  # noqa: BLE001
+            yield _sse({"type": "error", "message": f"The query engine is unavailable: {e}"})
+            return
+        yield _sse({"type": "sql", "sql": res["sql"], "rows": res["rows"][:50],
+                    "row_count": len(res["rows"])})
+        user = (f"Question: {payload.question}\n\n"
+                f"Result rows (JSON):\n{json.dumps(res['rows'][:40], default=str)}")
+        try:
+            for kind, val in llm.stream(_CHAT_SYS, user):
+                yield _sse({"type": "meta", "provider": val} if kind == "meta"
+                           else {"type": "delta", "text": val})
+            yield _sse({"type": "done"})
+        except Exception as e:  # noqa: BLE001
+            yield _sse({"type": "error", "message": f"Answer synthesis failed: {e}"})
+
+    return StreamingResponse(gen(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.post("/query", response_model=AnswerOut)
